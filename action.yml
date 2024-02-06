@@ -15,6 +15,10 @@ inputs:
     description: Extra arguments to `poetry install`
     required: false
     default: ''
+  working-directory:
+    description: Working directory for poetry install
+    required: false
+    default: '.'
 
 runs:
   using: "composite"
@@ -49,12 +53,12 @@ runs:
       id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}${{ inputs.install-args }}
+        path: ${{ inputs.working-directory }}/.venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ inputs.working-directory }}-${{ hashFiles(concat(inputs.working-directory, '/poetry.lock')) }}${{ inputs.install-args }}
         # Restore cache with this prefix if not exact match with key
         # Note cache-hit returns false in this case, so the below step will run
         restore-keys: |
-          venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+          venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ inputs.working-directory }}-
     #----------------------------------------------------------#
     #       Install dependencies if cache does not exist       #
     #----------------------------------------------------------#
@@ -62,3 +66,4 @@ runs:
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       shell: bash
       run: poetry install --no-interaction --no-root ${{ inputs.install-args }}
+      working-directory: ${{ inputs.working-directory }}
