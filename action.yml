@@ -54,7 +54,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ${{ inputs.working-directory }}/.venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ inputs.working-directory }}-${{ hashFiles(concat(inputs.working-directory, '/poetry.lock')) }}${{ inputs.install-args }}
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ inputs.working-directory }}-${{ hashFiles(format('{0}/poetry.lock', inputs.working-directory)) }}${{ inputs.install-args }}
         # Restore cache with this prefix if not exact match with key
         # Note cache-hit returns false in this case, so the below step will run
         restore-keys: |
